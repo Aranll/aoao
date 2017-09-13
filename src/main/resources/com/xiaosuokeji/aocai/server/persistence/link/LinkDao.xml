@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xiaosuokeji.aocai.server.dao.link.LinkDao">
+
+    <insert id="save" parameterType="link">
+        INSERT IGNORE INTO aocai.link(id,`name`,type_id,url,image,seq,showable)
+        VALUES (#{id},#{name},#{type.id},#{url},#{image},#{seq},#{showable})
+    </insert>
+
+    <delete id="remove" parameterType="link">
+        DELETE FROM aocai.link
+        WHERE id=#{id}
+    </delete>
+
+    <update id="update" parameterType="link">
+        UPDATE aocai.link
+        <trim prefix="SET" prefixOverrides=",">
+            <if test="name!=null">
+                ,`name`=#{name}
+            </if>
+            <if test="type!=null and type.id!=null">
+                ,type_id=#{type.id}
+            </if>
+            <if test="url!=null">
+                ,url=#{url}
+            </if>
+            <if test="image!=null">
+                ,image=#{image}
+            </if>
+            <if test="seq!=null">
+                ,seq=#{seq}
+            </if>
+            <if test="showable!=null">
+                ,showable=#{showable}
+            </if>
+            ,update_time=NOW()
+        </trim>
+        WHERE id=#{id}
+    </update>
+
+    <resultMap id="linkMap" type="link" autoMapping="true">
+        <association property="type" javaType="linkType" autoMapping="true" columnPrefix="t_" />
+    </resultMap>
+
+    <select id="get" parameterType="link" resultMap="linkMap">
+        SELECT l.*,
+        t.id AS t_id,t.name AS t_name
+        FROM aocai.link l
+        JOIN aocai.link_type t ON l.type_id=t.id
+        WHERE l.id=#{id}
+    </select>
+
+    <sql id="listCondition">
+        FROM aocai.link l
+        LEFT JOIN aocai.link_type t ON l.type_id=t.id
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="id!=null and id!=''">
+                AND l.id=#{id}
+            </if>
+            <if test="dynamic!=null and dynamic.id!=null and dynamic.id!=''">
+                AND l.id LIKE CONCAT('%',#{dynamic.id},'%')
+            </if>
+            <if test="name!=null and name!=''">
+                AND l.name=#{name}
+            </if>
+            <if test="dynamic!=null and dynamic.name!=null and dynamic.name!=''">
+                AND l.name LIKE CONCAT('%',#{dynamic.name},'%')
+            </if>
+            <if test="type!=null and type.id!=null">
+                AND l.type_id=#{type.id}
+            </if>
+            <if test="showable!=null">
+                AND l.showable=#{showable}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="list" parameterType="link" resultMap="linkMap">
+        SELECT l.*,
+        t.id AS t_id,t.name AS t_name
+        <include refid="listCondition" />
+        <include refid="BaseMapper.sort" />
+        <include refid="BaseMapper.limit" />
+    </select>
+
+    <select id="listCombo" parameterType="link" resultType="link">
+        SELECT id,`name`,url,image
+        FROM aocai.link
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="type!=null and type.id!=null">
+                AND type_id=#{type.id}
+            </if>
+        </trim>
+        <include refid="BaseMapper.sort" />
+        <include refid="BaseMapper.limit" />
+    </select>
+
+    <select id="count" parameterType="link" resultType="long">
+        SELECT COUNT(*)
+        <include refid="listCondition" />
+    </select>
+</mapper>

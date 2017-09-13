@@ -1,0 +1,21 @@
+{
+  "AccessKeyID": "LTAIkclBbVhsEpGf",
+  "AccessKeySecret": "D9hwgRigRIKQ6rIE4PBUglmKsqTpUm",
+  "RoleArn": "acs:ram::1362484620841928:role/aliyunosstokenrole",
+  "TokenExpireTime": 900,
+  "Policy": {
+    "Statement": [
+      {
+        "Action": [
+          "oss:*"
+        ],
+        "Effect": "Allow",
+        "Resource": [
+          "acs:oss:*:*:aocai-home/*",
+          "acs:oss:*:*:aocai-home"
+        ]
+      }
+    ],
+    "Version": "1"
+  }
+}

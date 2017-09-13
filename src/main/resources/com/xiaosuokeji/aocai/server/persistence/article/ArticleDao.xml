@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xiaosuokeji.aocai.server.dao.article.ArticleDao">
+
+    <insert id="save" parameterType="article">
+        INSERT IGNORE INTO aocai.article(id,type_id,title,content_type,url,content,image,seq,showable)
+        VALUES (#{id},#{type.id},#{title},#{contentType},#{url},#{content},#{image},#{seq},#{showable})
+    </insert>
+
+    <delete id="remove" parameterType="article">
+        DELETE FROM aocai.article
+        WHERE id=#{id}
+    </delete>
+
+    <update id="update" parameterType="article">
+        UPDATE aocai.article
+        <trim prefix="SET" prefixOverrides=",">
+            <if test="type!=null and type.id!=null">
+                ,type_id=#{type.id}
+            </if>
+            <if test="title!=null">
+                ,title=#{title}
+            </if>
+            <if test="contentType!=null">
+                ,content_type=#{contentType}
+            </if>
+            <if test="url!=null">
+                ,url=#{url}
+            </if>
+            <if test="content!=null">
+                ,content=#{content}
+            </if>
+            <if test="image!=null">
+                ,image=#{image}
+            </if>
+            <if test="seq!=null">
+                ,seq=#{seq}
+            </if>
+            <if test="showable!=null">
+                ,showable=#{showable}
+            </if>
+            ,update_time=NOW()
+        </trim>
+        WHERE id=#{id}
+    </update>
+
+    <resultMap id="articleMap" type="article" autoMapping="true">
+        <association property="type" javaType="articleType" autoMapping="true" columnPrefix="t_" />
+    </resultMap>
+
+    <select id="get" parameterType="article" resultMap="articleMap">
+        SELECT a.*,
+        t.id AS t_id,t.name AS t_name
+        FROM aocai.article a
+        LEFT JOIN aocai.article_type t ON a.type_id=t.id
+        WHERE a.id=#{id}
+    </select>
+
+    <sql id="listCondition">
+        FROM aocai.article a
+        LEFT JOIN aocai.article_type t ON a.type_id=t.id
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="id!=null and id!=''">
+                AND a.id=#{id}
+            </if>
+            <if test="dynamic!=null and dynamic.id!=null and dynamic.id!=''">
+                AND a.id LIKE CONCAT('%',#{dynamic.id},'%')
+            </if>
+            <if test="type!=null and type.id!=null">
+                AND a.type_id=#{type.id}
+            </if>
+            <if test="title!=null and title!=''">
+                AND a.title=#{title}
+            </if>
+            <if test="dynamic!=null and dynamic.title!=null and dynamic.title!=''">
+                AND a.title LIKE CONCAT('%',#{dynamic.title},'%')
+            </if>
+            <if test="contentType!=null">
+                AND a.content_type=#{contentType}
+            </if>
+            <if test="showable!=null">
+                AND a.showable=#{showable}
+            </if>
+            <if test="dynamic!=null and dynamic.key!=null and dynamic.key!=''">
+                AND (a.title LIKE CONCAT('%',#{dynamic.key},'%') OR a.content LIKE CONCAT('%',#{dynamic.key},'%'))
+            </if>
+            <if test="dynamic!=null and dynamic.startCreateDate!=null and dynamic.startCreateDate!=''">
+                AND DATE(a.create_time) &gt;= #{dynamic.startCreateDate}
+            </if>
+            <if test="dynamic!=null and dynamic.endCreateDate!=null and dynamic.endCreateDate!=''">
+                AND DATE(a.create_time) &lt;= #{dynamic.endCreateDate}
+            </if>
+            <if test="dynamic!=null and dynamic.startUpdateDate!=null and dynamic.startUpdateDate!=''">
+                AND DATE(a.update_time) &gt;= #{dynamic.startUpdateDate}
+            </if>
+            <if test="dynamic!=null and dynamic.endUpdateDate!=null and dynamic.endUpdateDate!=''">
+                AND DATE(a.update_time) &lt;= #{dynamic.endUpdateDate}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="list" parameterType="article" resultMap="articleMap">
+        SELECT a.*,
+        t.id AS t_id,t.name AS t_name
+        <include refid="listCondition" />
+        <include refid="BaseMapper.sort" />
+        <include refid="BaseMapper.limit" />
+    </select>
+
+    <select id="listCombo" parameterType="article" resultType="article">
+        SELECT id,title,image
+        FROM aocai.article
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="type!=null and type.id!=null">
+                AND type_id=#{type.id}
+            </if>
+            <if test="showable!=null">
+                AND showable=#{showable}
+            </if>
+        </trim>
+        <include refid="BaseMapper.sort" />
+        <include refid="BaseMapper.limit" />
+    </select>
+
+    <select id="count" parameterType="article" resultType="long">
+        SELECT COUNT(*)
+        <include refid="listCondition" />
+    </select>
+</mapper>

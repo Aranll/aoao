@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xiaosuokeji.aocai.server.dao.user.StaffDao">
+
+    <insert id="save" parameterType="staff">
+        INSERT IGNORE INTO aocai.staff(username,password,`name`,mobile,status)
+        VALUES (#{username},#{password},#{name},#{mobile},#{status})
+    </insert>
+
+    <delete id="remove" parameterType="staff">
+        DELETE FROM aocai.staff
+        WHERE id=#{id}
+    </delete>
+
+    <update id="update" parameterType="staff">
+        UPDATE aocai.staff
+        <trim prefix="SET" prefixOverrides=",">
+            <if test="username!=null">
+                ,username=#{username}
+            </if>
+            <if test="password!=null">
+                ,password=#{password}
+            </if>
+            <if test="name!=null">
+                ,`name`=#{name}
+            </if>
+            <if test="mobile!=null">
+                ,mobile=#{mobile}
+            </if>
+            <if test="status!=null">
+                ,status=#{status}
+            </if>
+            ,update_time=NOW()
+        </trim>
+        WHERE id=#{id}
+    </update>
+
+    <select id="get" parameterType="staff" resultType="staff">
+        SELECT *
+        FROM aocai.staff
+        WHERE id=#{id}
+    </select>
+
+    <select id="getByUsername" parameterType="staff" resultType="staff">
+        SELECT *
+        FROM aocai.staff
+        WHERE username=#{username}
+    </select>
+
+    <sql id="listCondition">
+        FROM aocai.staff
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="id!=null">
+                AND id=#{id}
+            </if>
+            <if test="username!=null and username!=''">
+                AND username=#{username}
+            </if>
+            <if test="dynamic!=null and dynamic.username!=null and dynamic.username!=''">
+                AND username LIKE CONCAT('%',#{dynamic.username},'%')
+            </if>
+            <if test="name!=null and name!=''">
+                AND `name`=#{name}
+            </if>
+            <if test="dynamic!=null and dynamic.name!=null and dynamic.name!=''">
+                AND `name` LIKE CONCAT('%',#{dynamic.name},'%')
+            </if>
+            <if test="mobile!=null and mobile!=''">
+                AND mobile=#{mobile}
+            </if>
+            <if test="dynamic!=null and dynamic.mobile!=null and dynamic.mobile!=''">
+                AND mobile LIKE CONCAT('%',#{dynamic.mobile},'%')
+            </if>
+            <if test="status!=null">
+                AND status=#{status}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="list" parameterType="staff" resultType="staff">
+        SELECT *
+        <include refid="listCondition" />
+        <include refid="BaseMapper.sort" />
+        <include refid="BaseMapper.limit" />
+    </select>
+
+    <select id="count" parameterType="staff" resultType="long">
+        SELECT COUNT(*)
+        <include refid="listCondition" />
+    </select>
+</mapper>

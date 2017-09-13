@@ -1,0 +1,66 @@
+/**
+ 0.6
+ */
+@media (max-width: 768px) {
+
+    /*导航*/
+    .cg-nav {
+        height: 60px;
+    }
+
+    .nav-style ul li a {
+        height: 60px;
+        line-height: 56.4px;
+        padding: 0 12px;
+        font-size: 12px;
+        border-bottom: 3.6px solid transparent;
+    }
+
+    .nav-style ul li.active a {
+        border-bottom: 3.6px solid #FFC500;
+    }
+
+    .nav-style ul li:hover a {
+        border-bottom: 3.6px solid #FFC500;
+    }
+
+
+    /*玩家上分*/
+    .grade {
+        margin: 24px auto;
+        font-size: 14px;
+        color: #999999;
+    }
+
+    .grade, .aa {
+        height: 30px;
+        margin: 18px auto;
+    }
+
+    .grade a, .aa a {
+        height: 30px;
+        line-height: 30px;
+        text-indent: 12px;
+        font-size: 14px;
+    }
+
+    .method .method-box {
+        width: 144px;
+        height: 144px;
+    }
+
+
+    .method p {
+        margin-top: 16px;
+        margin-bottom: 32px;
+        font-size: 19px;
+    }
+
+    section .news li a {
+        font-size: 14px;
+        height: 36px;
+        max-width: 360px;
+        line-height: 36px;
+    }
+
+}

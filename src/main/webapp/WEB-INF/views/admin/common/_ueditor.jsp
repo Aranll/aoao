@@ -1,0 +1,1 @@
+<jsp:forward page ="/WEB-INF/assets/plugins/ueditor/jsp/controller.jsp" />

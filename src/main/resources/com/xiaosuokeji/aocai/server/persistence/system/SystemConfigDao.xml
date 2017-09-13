@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xiaosuokeji.aocai.server.dao.system.SystemConfigDao">
+
+    <insert id="save" parameterType="systemConfig">
+        INSERT IGNORE INTO aocai.system_config(id,`name`,`key`,`value`,config_type)
+        VALUES (#{id},#{name},#{key},#{value},#{configType})
+    </insert>
+
+    <delete id="remove" parameterType="systemConfig">
+        DELETE FROM aocai.system_config
+        WHERE id=#{id}
+    </delete>
+
+    <update id="update" parameterType="systemConfig">
+        UPDATE aocai.system_config
+        <trim prefix="SET" prefixOverrides=",">
+            <if test="name!=null">
+                ,`name`=#{name}
+            </if>
+            <if test="key!=null">
+                ,`key`=#{key}
+            </if>
+            <if test="value!=null">
+                ,`value`=#{value}
+            </if>
+            ,update_time=NOW()
+        </trim>
+        WHERE id=#{id}
+    </update>
+
+    <select id="get" parameterType="systemConfig" resultType="systemConfig">
+        SELECT *
+        FROM aocai.system_config
+        WHERE id=#{id}
+    </select>
+
+    <select id="getByKey" parameterType="systemConfig" resultType="systemConfig">
+        SELECT *
+        FROM aocai.system_config
+        WHERE `key`=#{key}
+    </select>
+
+    <sql id="listCondition">
+        FROM aocai.system_config
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="id!=null and id!=''">
+                AND id=#{id}
+            </if>
+            <if test="dynamic!=null and dynamic.id!=null and dynamic.id!=''">
+                AND id LIKE CONCAT('%',#{dynamic.id},'%')
+            </if>
+            <if test="name!=null and name!=''">
+                AND `name`=#{name}
+            </if>
+            <if test="dynamic!=null and dynamic.name!=null and dynamic.name!=''">
+                AND `name` LIKE CONCAT('%',#{dynamic.name},'%')
+            </if>
+            <if test="key!=null and key!=''">
+                AND `key`=#{key}
+            </if>
+            <if test="dynamic!=null and dynamic.key!=null and dynamic.key!=''">
+                AND `key` LIKE CONCAT('%',#{dynamic.key},'%')
+            </if>
+            <if test="configType!=null">
+                AND config_type=#{configType}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="list" parameterType="systemConfig" resultType="systemConfig">
+        SELECT *
+        <include refid="listCondition" />
+        <include refid="BaseMapper.sort" />
+        <include refid="BaseMapper.limit" />
+    </select>
+
+    <select id="count" parameterType="systemConfig" resultType="long">
+        SELECT COUNT(*)
+        <include refid="listCondition" />
+    </select>
+</mapper>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xiaosuokeji.aocai.server.dao.banner.BannerTypeDao">
+
+    <insert id="save" parameterType="bannerType">
+        INSERT IGNORE INTO aocai.banner_type(`name`,up_id,showable,seq)
+        VALUES (#{name},#{upType.id},#{showable},#{seq})
+    </insert>
+
+    <delete id="remove" parameterType="bannerType">
+        DELETE FROM aocai.banner_type
+        WHERE id=#{id}
+    </delete>
+
+    <update id="update" parameterType="bannerType">
+        UPDATE aocai.banner_type
+        <trim prefix="SET" prefixOverrides=",">
+            <if test="name!=null">
+                ,`name`=#{name}
+            </if>
+            <if test="upType!=null and upType.id!=null">
+                ,up_id=#{upType.id}
+            </if>
+            <if test="showable!=null">
+                ,showable=#{showable}
+            </if>
+            <if test="seq!=null">
+                ,seq=#{seq}
+            </if>
+            ,update_time=NOW()
+        </trim>
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateShowable" parameterType="bannerType">
+        UPDATE aocai.banner_type
+        SET showable=#{showable},
+        update_time=NOW()
+        <if test="children!=null and children.size>0">
+            WHERE id IN
+            <foreach collection="children" open="(" item="item" close=")" separator=",">
+                #{item.id}
+            </foreach>
+        </if>
+    </update>
+
+    <resultMap id="bannerTypeMap" type="bannerType" autoMapping="true">
+        <association property="upType" javaType="bannerType" autoMapping="true" columnPrefix="u_" />
+    </resultMap>
+
+    <select id="get" parameterType="bannerType" resultMap="bannerTypeMap">
+        SELECT t.*,
+        t.up_id AS u_id,u.name AS u_name
+        FROM aocai.banner_type t
+        LEFT JOIN aocai.banner_type u ON t.up_id=u.id
+        WHERE t.id=#{id}
+    </select>
+
+    <sql id="listCondition">
+        FROM aocai.banner_type t
+        LEFT JOIN aocai.banner_type u ON t.up_id=u.id
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="id!=null">
+                AND t.id=#{id}
+            </if>
+            <if test="name!=null and name!=''">
+                AND t.name=#{name}
+            </if>
+            <if test="dynamic!=null and dynamic.name!=null and dynamic.name!=''">
+                AND t.name LIKE CONCAT('%',#{dynamic.name},'%')
+            </if>
+            <if test="upType!=null and upType.id!=null">
+                AND t.up_id=#{upType.id}
+            </if>
+            <if test="showable!=null">
+                AND t.showable=#{showable}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="list" parameterType="bannerType" resultMap="bannerTypeMap">
+        SELECT t.*,
+        t.up_id AS u_id,u.name AS u_name
+        <include refid="listCondition" />
+        <include refid="BaseMapper.sort" />
+        <include refid="BaseMapper.limit" />
+    </select>
+
+    <select id="listCombo" parameterType="bannerType" resultMap="bannerTypeMap">
+        SELECT id,`name`,up_id AS u_id
+        FROM aocai.banner_type
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="showable!=null">
+                AND showable=#{showable}
+            </if>
+        </trim>
+        <include refid="BaseMapper.sort" />
+        <include refid="BaseMapper.limit" />
+    </select>
+
+    <select id="count" parameterType="bannerType" resultType="long">
+        SELECT COUNT(*)
+        <include refid="listCondition" />
+    </select>
+</mapper>

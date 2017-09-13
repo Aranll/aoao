@@ -1,0 +1,205 @@
+/**
+ 0.8
+ */
+@media (max-width: 992px) {
+
+
+    /*导航*/
+    .cg-nav {
+        height: 80px;
+    }
+
+    .nav-style ul li a {
+        height: 80px;
+        line-height: 75.2px;
+        padding: 0 16px;
+        font-size: 16px;
+        border-bottom: 4.8px solid transparent;
+    }
+
+    .nav-style ul li.active a {
+        border-bottom: 4.8px solid #FFC500;
+    }
+
+    .nav-style ul li:hover a {
+        border-bottom: 4.8px solid #FFC500;
+    }
+
+    /*玩家上分*/
+    .grade {
+        margin: 36px auto;
+        font-size: 19px;
+    }
+
+    .grade, .aa {
+        width: 90%;
+        height: 40px;
+        margin: 24px auto;
+    }
+
+    .grade a, .aa a {
+        height: 40px;
+        line-height: 40px;
+        text-indent: 16px;
+        font-size: 19px;
+    }
+
+    .method .method-box {
+        width: 144px;
+        height: 144px;
+    }
+
+    .method p {
+        margin-top: 16px;
+        margin-bottom: 32px;
+        font-size: 19px;
+    }
+
+    /*底部信息栏*/
+    .footer {
+        height: 96px;
+    }
+
+    .footer-nav {
+        max-width: 480px;
+    }
+
+    .footer-nav p {
+        padding-top: 4px;
+        font-size: 11px;
+    }
+
+    .footer-nav ul {
+        padding-top: 32px;
+    }
+
+    .footer-nav ul li a {
+        font-size: 14px;
+        padding: 0 18px;
+    }
+
+    .footer-img {
+        height: 64px;
+        width: 64px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: -80px;
+    }
+
+    /*关于我们内容区*/
+    .content {
+        margin: 48px auto;
+    }
+
+    .content dt {
+        font-size: 19px;
+        color: #333333;
+        height: 54px;
+        line-height: 54px;
+    }
+
+    .content dd {
+        font-size: 14px;
+        height: 54px;
+        line-height: 54px;
+    }
+
+    section .news li {
+        height: 36px;
+    }
+
+    section .news li a {
+        font-size: 14px;
+        height: 36px;
+        max-width: 480px;
+        line-height: 36px;
+    }
+
+    section .news li span {
+        font-size: 14px;
+        height: 36px;
+        line-height: 36px;
+    }
+
+
+    .pagination {
+        height: 32px;
+        font-size: 12px;
+        margin-top: 8px;
+    }
+
+    .pagination-left,
+    .pagination-right {
+        height: 32px;
+    }
+
+    .pagination-left span {
+        line-height: 32px;
+    }
+    .pagination li{
+        margin:0 1px;
+    }
+    .pagination li a {
+        height: 32px;
+        line-height: 32px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
+    /*右侧固定客服*/
+    .side-nav {
+        width: 224px;
+        height: 384px;
+        border-radius: 16px;
+    }
+
+    .close-box {
+        float: right;
+        width: 19px;
+        height: 19px;
+        z-index: 1;
+        margin: 8px;
+        cursor: pointer;
+    }
+
+    .service {
+        box-sizing: border-box;
+        width: 172px;
+        height: 270px;
+        margin: 85.6px auto 0 auto;
+    }
+
+    .service-box {
+        margin-top: 11px;
+    }
+
+    .service-box img {
+        width: 22px;
+        height: 22px;
+    }
+
+    .service-box span {
+        font-size: 14px;
+        color: #333333;
+        margin: 0 7px;
+        vertical-align: middle;
+    }
+
+    .service-box a {
+        font-size: 12px;
+        color: #333333;
+        padding: 6px 14px;
+        background: #FFC500;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.10);
+        border-radius: 4px;
+        text-decoration: none;
+    }
+
+    .code-big {
+        margin: 0 auto;
+        margin-top: 13px;
+    }
+
+
+}
