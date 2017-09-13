@@ -30,6 +30,8 @@ public class BannerController {
     @Pagination(items = "banners",api=API.BANNER_LIST,itemClass = Banner.class)
     @Index
     public String index(Model model, HttpServletRequest request,Banner banner){
+        String url = request.getRequestURI();
+        model.addAttribute("url",url);
         model.addAttribute("banner",banner);
         model.addAttribute("dynamic",banner.getDynamic());
         SecurityToken token=securityTokenServer.getToken();
@@ -40,6 +42,12 @@ public class BannerController {
     @RequestMapping(value = "/banner/save",method = RequestMethod.POST)
     @ResponseBody
     public String saveBanner(Model model, HttpServletRequest request, Banner banner){
+        if(banner.getImage()!=null&&banner.getImage().length()==0){
+            banner.setImage(null);
+        }
+        if(banner.getUrl()!=null&&banner.getUrl().length()==0){
+            banner.setUrl(null);
+        }
         return WebUtils.doRawRequest(API.BANNER_SAVE,banner).toString();
     }
 

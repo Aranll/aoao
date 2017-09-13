@@ -32,12 +32,15 @@ public class ArticleTypeController {
     @RequestMapping(value = "/type",method = RequestMethod.GET)
     @Index
     public String index(Model model, HttpServletRequest request,Type type){
+        String url = request.getRequestURI();
+
         JSONObject response = WebUtils.doRawRequest(API.ARTICLE_TYPE_LIST,type);
         if(response.getBoolean("status")){
             JSONObject data = response.getJSONObject("data");
             model.addAttribute("types", GsonUtils.fromJson(data.getJSONArray("list").toString(),new TypeToken<List<Type>>() {}.getType()));
         }
         SecurityToken token=securityTokenServer.getToken();
+        model.addAttribute("url",url);
         model.addAttribute("token",token);
         return "admin/article/articleType";
     }

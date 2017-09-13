@@ -104,7 +104,7 @@
                                     <input type="button" class="btn btn-danger m-r-sm" value="删除"
                                            onclick="removeType()">
                                     <input type="button" class="btn  btn-info " data-toggle="modal"
-                                           data-target="#updateOperation" value="保存">
+                                           data-target="#updateOperationModal" value="保存">
                                 </div>
                             </div>
                         </div>
@@ -116,19 +116,6 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    $updateForm.find("input[type='button']").prop('disabled', true);
-    $updateForm.find("input").on('input', function () {
-        if ($(this).val().length > 0) {
-            $updateForm.find("input[type='button']").prop('disabled', false);
-        } else {
-            $updateForm.find("input[type='button']").prop('disabled', true);
-        }
-    });
-    function changeUpdateBtnStatus(){
-        $updateForm.find("input[type='button']").prop('disabled', false);
-    }
-</script>
 <%--新活动图--%>
 <div class="modal fade" id="saveType" data-backdrop="static" role="dialog">
     <div class="modal-dialog" role="document">
@@ -189,6 +176,16 @@
     </div>
 </div>
 <%--新增活动图，模态框结束--%>
+<jsp:include page="../common/common.jsp"></jsp:include>
+<script>
+    function removeType() {
+        var name = $("#typeName").val();
+        var id = $("#typeId").val();
+        removeObject(name,id);
+    }
+    ztreeName = "活动图分类";
+    ossPathName = "banner/";
+</script>
 <%--新增活动图--%>
 <script type="text/javascript">
     var saveValidate = $saveForm.validate({
@@ -224,14 +221,7 @@
             }
         },
         submitHandler: function () {
-            doPost("<%=request.getContextPath()%>/admin/banner/type/save", $saveForm.serialize(), function (data) {
-                if (data.status) {
-                    $("#info_success").modal("show");
-                } else {
-                    $("#infoOfFalse").html(data.msg);
-                    $("#info_fail").modal("show");
-                }
-            });
+            doObject(saveUrl,$saveForm.serialize());
         }
     });
 
@@ -243,43 +233,6 @@
 
 </script>
 <%--新增活动图结束--%>
-
-<%--删除活动图--%>
-<script type="text/javascript">
-    var removeId;
-    var removeUrl;
-    // 删除操作，删除对应的对象
-    function removeType() {
-        var removeName = $("#typeName").val();
-        removeId = $("#typeId").val();
-        removeUrl = "<%=request.getContextPath()%>/admin/banner/type/remove";
-        var html = "确认删除分类？" + "<br>" + "[" + removeId + "-" + removeName + "]"
-        $("#delete_info").html(html);
-        $("#deleteOperation").modal('show');
-    }
-    function submitRemove() {
-        doPost(removeUrl, {id: removeId}, function (data) {
-            if (data.status) {
-                $("#info_success").modal('show');
-            } else {
-                $("#infoOfFalse").html(data.msg);
-                $("#info_fail").modal('show');
-            }
-            //释放内存
-            removeId = null;
-            removeUrl = null;
-        });
-        //防止误删
-        if (removeId != null) {
-            removeId = null;
-            removeUrl = null;
-        }
-    }
-
-</script>
-<%--删除活动图结束--%>
-
-
 <%--编辑活动图信息--%>
 <script>
     $updateForm.validate({
@@ -319,12 +272,6 @@
 
 </script>
 <%--编辑活动图信息结束--%>
-<%--Url--%>
-<script>
-    ztreeUrl = "<%=request.getContextPath()%>/admin/banner/type/combo/tree";
-    getUrl = "<%=request.getContextPath()%>/admin/banner/type/get";
-</script>
-
 <%--结束--%>
 <jsp:include page="../common/operationTip.jsp"></jsp:include>
 <jsp:include page="../common/selectCategory.jsp"></jsp:include>

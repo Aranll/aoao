@@ -69,7 +69,7 @@
                         <div class="form-group m-t-n-md">
                             <div class="col-xs-12">
                                 <input type="button" class="btn btn-success btn-default" data-toggle="modal"
-                                       data-target="#saveLink" value="新增">
+                                       data-target="#saveObjectModal" value="新增">
                                 <input class="btn btn-default pull-right" value="重置" type="button"
                                        onclick="resetSearch('searchForm')">
                                 <input class="btn btn-info pull-right m-r-sm" value="搜索" type="submit">
@@ -131,14 +131,14 @@
                                             </button>
                                         </c:if>
                                             <%--</sec:authorize>--%> <%--<sec:authorize access="hasAnyRole(${sessionScope.sec_op.link_link_update})">--%>
-                                        <button class="btn btn-info btn-xs" onclick="updateLink('${link.id}')">
+                                        <button class="btn btn-info btn-xs" onclick="updateObject('${link.id}')">
                                             编辑
                                         </button>
                                             <%--</sec:authorize>--%>
 
                                             <%--<sec:authorize access="hasAnyRole(${sessionScope.sec_op.link_link_remove})">--%>
                                         <button class="btn btn-danger btn-xs"
-                                                onclick="remove('${link.name}','${link.id}','<%=request.getContextPath()%>/admin/link/link/remove')">
+                                                onclick="removeObject('${link.name}','${link.id}')">
                                             删除
                                         </button>
                                             <%--</sec:authorize>--%>
@@ -162,9 +162,8 @@
         </div>
     </div>
 </div>
-
 <%--新链接--%>
-<div class="modal fade" id="saveLink" data-backdrop="static" role="dialog">
+<div class="modal fade" id="saveObjectModal" data-backdrop="static" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -174,7 +173,7 @@
                 <h4 class="modal-title">新增链接</h4>
             </div>
             <div class="modal-body">
-                <form name="saveForm" class="form-horizontal">
+                <form name="saveForm" id="saveForm" class="form-horizontal">
                     <div class="form-group row">
                         <div class="col-xs-3 text-right">
                             <label class="control-label required">名称：</label>
@@ -243,253 +242,8 @@
     </div>
 </div>
 <%--新增链接，模态框结束--%>
-<%--新增链接--%>
-<script type="text/javascript">
-    var $saveForm = $("form[name='saveForm']");  //新增的表单
-    var saveValidate = $saveForm.validate({
-        errorClass: 'text-danger',
-        rules: {
-            name: {
-                required: true,
-                notEmpty: true
-            },
-            'type.id': {
-                required: true,
-                notEmpty: true
-            },
-            seq: {
-                required: true,
-                notEmpty: true,
-                digits: true
-            },
-            showable: {
-                required: true,
-                notEmpty: true
-            },
-            url: {
-                required: true,
-                notEmpty: true,
-                url:true
-            }
-        },
-        messages: {
-            name: {
-                required: "名称不能为空",
-                notEmpty: "名称不能为空"
-            },
-            'type.id': {
-                required: "父级不能为空",
-                notEmpty: "父级不能为空"
-            },
-            seq: {
-                required: "顺序不能为空",
-                notEmpty: "顺序不能为空",
-                digits: "请输入数字"
-            },
-            showable: {
-                required: "上下架状态不能为空",
-                notEmpty: "上下架状态不能为空"
-            },
-            url: {
-                required: "链接不能为空",
-                notEmpty: "链接不能为空",
-                url: "请输入正确格式的url"
-            }
-        },
-        submitHandler: function () {
-            doPost("<%=request.getContextPath()%>/admin/link/link/save", $saveForm.serialize(), function (data) {
-                if (data.status) {
-                    $("#info_success").modal("show");
-                } else {
-                    $("#infoOfFalse").html(data.msg);
-                    $("#info_fail").modal("show");
-                }
-            });
-        }
-    });
-
-    $('#saveLink').on('hidden.bs.modal', function (e) {
-        saveValidate.resetForm();
-        $saveForm[0].reset();
-    });
-
-    //使用ajax提交表单
-    function submitSave() {
-        $saveForm.submit();
-    }
-</script>
-<%--新增链接结束--%>
-<%--文件上传&&新增图片--%>
-<script>
-    var images = [];
-    var $previewDiv = $("#previewDiv");
-
-    $(function () {
-        updatePreviewDiv();
-    });
-    function updatePreviewDiv() {
-        var html = "";
-        $.each(images, function (index, image) {
-            html += "<label>" +
-                "<img src='" + image + "'/>" +
-                "<a class='delete' href='javascript:confirmDeleteUpload(" + index + ")'>删除</a>" +
-                "</label>";
-        });
-        if (images.length === 0) {
-            html += "<label>" +
-                "<a id='add' class='add' onclick='clickUploadInput()'>" +
-                "<i class='fa fa-plus'></i>" +
-                "</a>" +
-                "</label>";
-        }
-        $previewDiv.html(html);
-    }
-    function clickUploadInput() {
-        $('#uploadInput').click();
-    }
-    //上传文件
-    function uploadPreview(file) {
-        if (file.files && file.files[0]) {
-            $("#add").html("<i class='fa fa-spin fa-spinner'></i>");
-//            这是需要修改图片路径，模块
-            client.multipartUpload("link/" + Date.parse(new Date()) + "_" + file.files[0].name, file.files[0], {
-                progress: function*(p) {
-                    console.log('Progress: ' + p);
-                }
-            }).then(function (result) {
-                images.push(result.url );
-                $("#url").val(result.url );
-                updatePreviewDiv();
-            }).catch(function (err) {
-                console.log(err);
-            });
-        }
-        $('#uploadInput').val("");
-    }
-    //弹出模态框确认删除操作
-    function confirmDeleteUpload(index) {
-        removeIndex = index;
-        $("#removeSaveIMG").modal("show");
-    }
-    function removeSaveIMG() {
-        images.splice(removeIndex, 1);
-        updatePreviewDiv();
-        $("#removeSaveIMG").modal("hide");
-    }
-</script>
-<%--文件上传结束--%>
-
-<%--改变用户状态--%>
-<div class="modal fade" id="changeId" data-backdrop="static" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">信息确认</h4>
-            </div>
-            <div class="modal-body">
-                <h4 class="text-danger" id="statusInfo"></h4>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-danger" onclick="submitChange()">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
-<%--上下架开始--%>
-<script>
-    var linkId;
-    var linkShowable;
-    function updateStatus(id, status) {
-        linkId = id;
-        linkShowable = status;
-        if (status == 0) {
-            $("#statusInfo").html("确定下架？");
-        } else {
-            $("#statusInfo").html("确定上架?");
-        }
-        $("#changeId").modal('show');
-    }
-    function submitChange() {
-        doPost("<%=request.getContextPath()%>/admin/link/link/update", {
-            id: linkId,
-            showable: linkShowable
-        }, function (data) {
-            if (data.status) {
-                $("#info_success").modal().show();
-            } else {
-                $("#infoOfFalse").html(data.msg);
-                $("#info_fail").modal().show();
-            }
-        });
-    }
-</script>
-<%--上下架结束--%>
-
-<%--删除新增图片--%>
-<div class="modal fade" id="removeSaveIMG" data-backdrop="static" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">信息确认</h4>
-            </div>
-            <div class="modal-body text-center">
-                <h4 class="text-danger">确定删除该图片？</h4>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-danger" onclick="removeSaveIMG()">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
-<%--删除图片结束--%>
-<%--删除链接--%>
-<script type="text/javascript">
-    var removeId;
-    var removeUrl;
-    var removeName;
-    var removeIndex; //删除图片的下标
-    // 删除操作，删除对应的对象
-    function remove(name, id, url) {
-        removeName = name;
-        removeId = id;
-        removeUrl = url;
-        var html = "确认删除分类？" + "<br>" + "[" + removeId + "-" + removeName + "]"
-        $("#delete_info").html(html);
-        $("#deleteOperation").modal('show');
-    }
-    function submitRemove() {
-        doPost(removeUrl, {id: removeId}, function (data) {
-            //防止误删
-            removeId = null;
-            removeUrl = null;
-            if (data.status) {
-                $("#info_success").modal('show');
-            } else {
-                $("#infoOfFalse").html(data.msg);
-                $("#info_fail").modal('show');
-            }
-        });
-        //防止误删
-        if (removeId != null) {
-            removeId = null;
-            removeUrl = null;
-        }
-    }
-</script>
-<%--删除链接结束--%>
-
-
-
 <%--编辑链接--%>
-<div class="modal fade" id="updateLink" data-backdrop="static" role="dialog">
+<div class="modal fade" id="updateObjectModal" data-backdrop="static" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -499,7 +253,7 @@
                 <h4 class="modal-title">编辑链接</h4>
             </div>
             <div class="modal-body">
-                <form name="updateForm" class="form-horizontal">
+                <form id="updateForm" name="updateForm" class="form-horizontal">
                     <div class="form-group row">
                         <div class="col-xs-3 text-right">
                             <label class="control-label required">名称：</label>
@@ -569,100 +323,75 @@
     </div>
 </div>
 <%--编辑链接，模态框结束--%>
-<%--获取编辑链接--%>
+<jsp:include page="../common/common.jsp"></jsp:include>
 <script>
-    var $updateForm = $("form[name='updateForm']");
-    function updateLink(id) {
-        var id = id;
-        doPost("<%=request.getContextPath()%>/admin/link/link/get", {id: id}, function (data) {
-            var _data = data.data;
-            var image = '';
-            if (data.status) {
-                $updateForm.find("input[name='id']").val(_data.id);
-                $updateForm.find("input[name='name']").val(_data.name);
-                $updateForm.find("input[name='seq']").val(_data.seq);
-                $updateForm.find("input[name='type.name']").val(_data.type.name);
-                $updateForm.find("input[name='type.id']").val(_data.type.id);
-                $updateForm.find("input[name='url']").val(_data.url);
-                $updateForm.find("select[name='showable']").val(_data.showable);
-                $updateForm.find("input[name='image']").val(_data.image);
-                updateImages = [];
-                updateImages.push(_data.image);
-                updateUpdatePreviewDiv();
-            } else {
-                $("#infoOfFalse").html(data.msg);
-                $("#info_fail").modal().show();
-            }
-        });
-        $("#updateLink").modal("show");
-    }
+    ztreeName = "图片管理";
+    updateHtml = "下架";
+    ossPathName = "link/";
 </script>
-<%--获取结束--%>
-<%--编辑文件图片上传--%>
+<%--新增链接--%>
 <script type="text/javascript">
-    var updateImages = [];
-    var $updatePreviewDiv = $("#updatePreviewDiv");
-    $(function () {
-        updateUpdatePreviewDiv();
+    var saveValidate = $saveForm.validate({
+        errorClass: 'text-danger',
+        rules: {
+            name: {
+                required: true,
+                notEmpty: true
+            },
+            'type.id': {
+                required: true,
+                notEmpty: true
+            },
+            seq: {
+                required: true,
+                notEmpty: true,
+                digits: true
+            },
+            showable: {
+                required: true,
+                notEmpty: true
+            },
+            url: {
+                required: true,
+                notEmpty: true,
+                url:true
+            }
+        },
+        messages: {
+            name: {
+                required: "名称不能为空",
+                notEmpty: "名称不能为空"
+            },
+            'type.id': {
+                required: "父级不能为空",
+                notEmpty: "父级不能为空"
+            },
+            seq: {
+                required: "顺序不能为空",
+                notEmpty: "顺序不能为空",
+                digits: "请输入数字"
+            },
+            showable: {
+                required: "上下架状态不能为空",
+                notEmpty: "上下架状态不能为空"
+            },
+            url: {
+                required: "链接不能为空",
+                notEmpty: "链接不能为空",
+                url: "请输入正确格式的url"
+            }
+        },
+        submitHandler: function () {
+            doObject(saveUrl,$saveForm.serialize());
+        }
     });
 
-    function updateUpdatePreviewDiv() {
-        var html = "";
-        $.each(updateImages, function (index, image) {
-            html += "<label>" +
-                "<img src='" + image + "'/>" +
-                "<a class='delete' href='javascript:updateConfirmDeleteUpload(" + index + ")'>删除" +
-                "</a>" +
-                "</label>";
-        });
-        if (updateImages.length === 0) {
-            html += "<label>" +
-                "<a id='addUpdate' class='add' onclick='clickUpdateUploadInput()'>" +
-                "<i class='fa fa-plus'></i>" +
-                "</a>" +
-                "</label>";
-        }
-        $updatePreviewDiv.html(html);
-    }
-    function clickUpdateUploadInput() {
-        $("#updateUploadInput").click();
-    }
-
-    function updateUploadPreview(file) {
-        if (file.files && file.files[0]) {
-            $("#addUpdate").html("<i class='fa fa-spin fa-spinner'></i>");
-//            这是需要修改图片路径，模块
-            client.multipartUpload("link/" + Date.parse(new Date()) + "_" + file.files[0].name, file.files[0], {
-                progress: function*(p) {
-                    console.log('Progress: ' + p);
-                }
-            }).then(function (result) {
-                console.log(result);
-                updateImages.push(result.url );
-                $("#updateUrl").val(result.url );
-                updateUpdatePreviewDiv();
-            }).catch(function (err) {
-                console.log(err);
-            });
-        }
-        $('#updateUploadInput').val("");
-    }
-
-
-    function updateConfirmDeleteUpload(index) {
-        removeIndex = index;
-        $("#removeUpdateIMG").modal("show");
-
-    }
-    function removeUpdateIMG() {
-        updateImages.splice(removeIndex, 1);
-        updateUpdatePreviewDiv();
-        $("#removeUpdateIMG").modal("hide");
-    }
-
-
+    $('#saveObjectModal').on('hidden.bs.modal', function (e) {
+        saveValidate.resetForm();
+        $saveForm[0].reset();
+    });
 </script>
-<%--编辑文件图片上传结束--%>
+<%--新增链接结束--%>
 <%--编辑链接信息--%>
 <script>
     $updateForm.validate({
@@ -716,205 +445,12 @@
             }
         },
         submitHandler: function () {
-            doPost("<%=request.getContextPath()%>/admin/link/link/update", $updateForm.serialize(), function (data) {
-                if (data.status) {
-                    $("#info_success").modal("show");
-                } else {
-                    $("#infoOfFalse").html(data.msg);
-                    $("#info_fail").modal("show");
-                }
-            });
+            doObject(updateUrl,$updateForm.serialize());
         }
     });
-
-    function submitUpdate() {
-        $updateForm.submit();
-    }
 </script>
 <%--编辑链接信息结束--%>
-<%--编辑及删除图片结束--%>
-
-<%--选择分类--%>
-<div id="selectCategory" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-            </div>
-            <div class="modal-body">
-                <div id="menuContent2" myStatus="hidden" class="zTreeDemoBackground ">
-                    <ul id="tree" class="ztree" style="margin-top:0; width:160px;"></ul>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-            </div>
-        </div>
-    </div>
-</div>
-<%--选择分类结束--%>
-<%--选择分类管理--%>
-<script>
-    var $searchForm = $("#searchForm");
-    //type 0为展示所有节点，1为展示一级节点，2为展示一二级节点
-    var type;
-    var targetElement;
-    //ztree设置
-    var zTreeObj, setting = {
-        check: {
-            enable: false
-        },
-        async: {
-            enable: true,
-            type: "post",
-            url: asyncUrl,
-            dataFilter: asyncFilter
-        },
-        callback: {
-            onClick: onClickNode,
-            beforeAsync: beforeAsync,
-            onAsyncSuccess: onAsyncSuccess
-        }
-    };
-    var zTreeNodes = [];
-    function asyncUrl() {
-        return "<%=request.getContextPath()%>/admin/link/type/combo/tree";
-    }
-    function onAsyncSuccess() {
-        if (type == 1) {
-            var allNodes = zTreeObj.getNodes();
-
-            for (var i = 0; i < allNodes.length; i++) {
-                zTreeObj.removeChildNodes(allNodes[i]);
-            }
-        } else if (type == 2) {
-            var allNodes = zTreeObj.getNodes();
-            for (var i = 0; i < allNodes.length; i++) {
-                var childNodes = allNodes[i].children;
-                for (var j = 0; j < childNodes[j].length; j++) {
-                    zTreeObj.removeChildNodes(allNodes[i]);
-                }
-            }
-        }
-    }
-
-    function beforeAsync(treeId, treeNode) {
-        if (treeNode === undefined)
-            return false;
-    }
-
-    function asyncFilter(treeId, parentNode, responseData) {
-        if (responseData.status) {
-            var data = {
-                id:0,
-                name:"链接管理",
-                children: responseData.data
-            }
-            return data;
-        } else {
-            alert(responseData.msg);
-            return [];
-        }
-    }
-
-    $(document).ready(function () {
-        zTreeObj = $.fn.zTree.init($("#tree"), setting, zTreeNodes);
-        zTreeObj.expandAll(true);
-    });
-    function ZtreeNode(id, pId, name) {//定义ztree的节点类
-        this.id = id;
-        this.pId = pId;
-        this.name = name;
-    }
-    //显示菜单
-    function showMenu(e, t) {
-        targetElement = e;
-        type = t;
-        zTreeObj.reAsyncChildNodes(null, "refresh");
-
-        $("#selectCategory").modal();
-        $("#menuContent2").css({left: "15px", top: "34px"}).slideDown("fast");
-    }
-
-    //节点点击事件
-    function onClickNode(e, treeId, treeNode) {
-        var sNodes = zTreeObj.getSelectedNodes();
-        if (sNodes.length > 0) {
-            $(targetElement).next().attr("value", (sNodes[0].id));
-            $(targetElement).val(sNodes[0].name);
-
-        }
-        $("#selectCategory").modal('hide');
-    }
-</script>
-<%--选择分类管理结束--%>
-<%--侧边选择分类修改链接分类--%>
-<script>
-    //ztree设置
-    var typeId;
-    var zTreeObjType, settingType = {
-        showLine: true,
-        check: {
-            enable: false
-        },
-        async: {
-            enable: true,
-            type: "post",
-            url: asyncUrl,
-            dataFilter: asyncFilter
-        },
-        callback: {
-            onClick: onClickTypeNode,
-            beforeAsync: beforeAsyncType,
-            onAsyncSuccess: onAsyncSuccessType()
-        }
-    };
-
-    function beforeAsyncType(treeId, treeNode) {
-        if (treeNode === undefined)
-            return false;
-    }
-    function onAsyncSuccessType(treeNode) {
-    }
-    //显示菜单
-    function showMenuType() {
-        zTreeObjType.reAsyncChildNodes(null, "refresh");
-    }
-
-    //节点点击事件
-    function onClickTypeNode(e, treeId, treeNode) {
-        var sNodes = zTreeObjType.getSelectedNodes();
-        $("#typeId").val(sNodes[0].id);
-        $searchForm.submit();
-    }
-
-
-    $(document).ready(function () {
-        zTreeObjType = $.fn.zTree.init($("#typeTree"), settingType, zTreeNodes);
-        showMenuType();
-    });
-</script>
-<%--结束--%>
-<%--删除编辑图片--%>
-<div class="modal fade" id="removeUpdateIMG" data-backdrop="static" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">信息确认</h4>
-            </div>
-            <div class="modal-body text-center">
-                <h4 class="text-danger">确定删除该图片？</h4>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-danger" onclick="removeUpdateIMG()">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
-<%--删除编辑文件结束--%>
+<jsp:include page="../common/select.jsp"></jsp:include>
 <jsp:include page="../common/operationTip.jsp"></jsp:include>
 </body>
 </html>

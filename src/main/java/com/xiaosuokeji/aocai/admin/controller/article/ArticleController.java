@@ -34,9 +34,11 @@ public class ArticleController {
     public String index(Model model, HttpServletRequest request,Article article){
         String redirectUrl = request.getRequestURI();
         String queryString = request.getQueryString();
+        String url = request.getRequestURI();
         if(queryString!=null){
             redirectUrl+="?"+queryString;
         }
+        model.addAttribute("url",url);
         model.addAttribute("redirectUrl",redirectUrl);
         model.addAttribute("article",article);
         model.addAttribute("dynamic",article.getDynamic());

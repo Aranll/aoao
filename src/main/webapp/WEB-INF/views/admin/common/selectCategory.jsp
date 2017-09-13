@@ -6,24 +6,6 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%--选择分类--%>
-<div id="selectCategory" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-            </div>
-            <div class="modal-body">
-                <div id="menuContent2" myStatus="hidden" class="zTreeDemoBackground ">
-                    <ul id="tree" class="ztree" style="margin-top:0; width:160px;"></ul>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-            </div>
-        </div>
-    </div>
-</div>
-<%--选择分类结束--%>
 <%--选择分类管理--%>
 <script>
 
@@ -79,7 +61,7 @@
         if (responseData.status) {
             var data = {
                 id:0,
-                name:"文章分类",
+                name:ztreeName,
                 children:responseData.data
             };
             return data;
@@ -97,7 +79,6 @@
         this.pId = pId;
         this.name = name;
     }
-    var childZNode = new ZtreeNode('0', null, '文章分类');
     //显示菜单
     function showMenu(e, t) {
         targetElement = e;
@@ -113,7 +94,7 @@
         var sNodes = zTreeObj.getSelectedNodes();
         if (sNodes.length > 0) {
             $(targetElement).next().attr("value", (sNodes[0].id));
-            $(targetElement).val(sNodes[0].name);
+            $(targetElement).attr("value",(sNodes[0].name));
             changeUpdateBtnStatus();
         }
         $("#selectCategory").modal('hide');
@@ -167,6 +148,7 @@
                 $updateForm.find("select[name='showable']").val(_data.showable);
                 $updateForm.find("input[name='seq']").val(_data.seq);
                 $updateForm.find("input[name='upType.id']").val(_data.upType.id);
+                $updateForm.find("input[name='upType.name']").val(_data.upType.name);
                 $updateForm.find("input[name='icon']").val(_data.icon);
                 $updateForm.find("input[name='urlPrefix']").val(_data.urlPrefix);
                 $updateForm.find("input[name='upTypeName']").val(_data.upType.name);
@@ -190,14 +172,6 @@
 </script>
 <%--结束--%>
 <%--删除分类--%>
-<script>
-    function removeCategory(){
-        var id = $updateForm.find("input[name='id']").val();
-        var name = $updateForm.find("input[name='name']").val();
-        var url = "<%=request.getContextPath()%>/admin/article/type/remove";
-        remove(name,id,url);
-    }
-</script>
 <%--删除分类结束--%>
 <script type="text/javascript">
     $updateForm.find("input[type='button']").prop('disabled', true);
@@ -208,7 +182,4 @@
             $updateForm.find("input[type='button']").prop('disabled', true);
         }
     });
-    function changeUpdateBtnStatus(){
-        $updateForm.find("input[type='button']").prop('disabled', false);
-    }
 </script>

@@ -134,7 +134,6 @@
                             </div>
                         </div>
                     </form>
-                <%--</div>--%>
                     <div class="panel panel-default m-b-none">
                         <table class="table text-center table-bordered table-striped m-b-none">
                             <thead>
@@ -172,39 +171,32 @@
                                         <td>上架</td>
                                     </c:if>
                                     <td>
-                                            <%--<sec:authorize access="hasAnyRole(${sessionScope.sec_op.article_article_get})">--%>
                                         <a href="${article.url}">
                                             <button class="btn btn-success btn-xs">
                                                 预览
                                             </button>
                                         </a>
-                                            <%--</sec:authorize>--%>
-                                            <%--<sec:authorize access="hasAnyRole(${sessionScope.sec_op.article_article_update})">--%>
                                         <c:if test="${article.showable eq 0}">
                                             <button class="btn btn-warning btn-xs"
-                                                    onclick="updateShowableStatus('${article.id}',1,'确定上架[${article.id}-${article.title}]')">
+                                                    onclick="updateStatus('${article.id}',1)">
                                                 上架
                                             </button>
                                         </c:if>
                                         <c:if test="${article.showable eq 1}">
-                                            <button class="btn btn-warning btn-xs"onclick="updateShowableStatus('${article.id}',0,'确定下架[${article.id}-${article.title}]？')">
+                                            <button class="btn btn-warning btn-xs"onclick="updateStatus('${article.id}',0)">
                                                 下架
                                             </button>
                                         </c:if>
-                                            <%--</sec:authorize>--%> <%--<sec:authorize access="hasAnyRole(${sessionScope.sec_op.article_article_update})">--%>
                                         <a href="<%=request.getContextPath()%>/admin/article/article/update?redirectUrl=${redirectUrl}&id=${article.id}">
                                             <button class="btn btn-info btn-xs">
                                                 编辑
                                             </button>
                                         </a>
-                                            <%--</sec:authorize>--%>
 
-                                            <%--<sec:authorize access="hasAnyRole(${sessionScope.sec_op.article_article_remove})">--%>
                                         <button class="btn btn-danger btn-xs"
                                                 onclick="remove('${article.title}','${article.id}','<%=request.getContextPath()%>/admin/article/article/remove')">
                                             删除
                                         </button>
-                                            <%--</sec:authorize>--%>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -225,57 +217,11 @@
         </div>
     </div>
 </div>
-<%--改变上下架状态--%>
-<div class="modal fade" id="updateShowableModal" data-backdrop="static" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">信息确认</h4>
-            </div>
-            <div class="modal-body text-center">
-                <h4 class="text-danger" id="statusInfo"></h4>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-danger" onclick="submitUpdateShowableStatus()">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
-<%--上下架开始--%>
+<jsp:include page="../common/common.jsp"></jsp:include>
 <script>
-    //改变对象的状态
-    var showableId; //对象的id
-    var showableStatus;  //对象改变成的状态
-    var updateUrl = "<%=request.getContextPath()%>/admin/article/article/update";
-    function updateShowableStatus(id, status, html){
-        showableId = id;
-        showableStatus = status;
-        if (status == 0){
-            $("#statusInfo").html(html); //显示在模态框中的提示信息
-        }else{
-            $("#statusInfo").html(html);
-        }
-        $("#updateShowableModal").modal('show');
-    }
-    function submitUpdateShowableStatus(){
-        doPost(updateUrl,{id:showableId,showable:showableStatus},function (data) {
-            if (data.status) {
-                $("#info_success").modal().show();
-            } else {
-                $("#infoOfFalse").html(data.msg);
-                $("#info_fail").modal().show();
-            }
-        });
-    }
-</script>
-<%--上下架结束--%>
-<%--url--%>
-<script>
-    ztreeUrl="<%=request.getContextPath()%>/admin/article/type/combo/tree";
+    ztreeName = "文章管理";
+    updateHtml = "下架";
+    ossPathName = "article/";
 </script>
 <jsp:include page="../common/operationTip.jsp"></jsp:include>
 <jsp:include page="../common/select.jsp"></jsp:include>

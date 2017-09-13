@@ -117,6 +117,15 @@ public class Type extends PaginationModel {
          */
 
         private Long id;
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
 
         public Long getId() {
             return id;
@@ -125,5 +134,6 @@ public class Type extends PaginationModel {
         public void setId(Long id) {
             this.id = id;
         }
+
     }
 }

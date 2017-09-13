@@ -29,6 +29,8 @@ public class LinkController {
     @Pagination(items = "links",api=API.LINK_LIST,itemClass = Link.class)
     @Index
     public String index(Model model, HttpServletRequest request, Link link){
+        String url = request.getRequestURI();
+        model.addAttribute("url",url);
         model.addAttribute("link",link);
         model.addAttribute("dynamic",link.getDynamic());
         SecurityToken token=securityTokenServer.getToken();

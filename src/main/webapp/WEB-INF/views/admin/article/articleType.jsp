@@ -125,9 +125,9 @@
                             <div class="row">
                                 <div>
                                     <input type="button" class="btn btn-danger m-r-sm" value="删除"
-                                           onclick="removeCategory()">
+                                           onclick="removeType()">
                                     <input type="button" class="btn  btn-info " data-toggle="modal"
-                                           data-target="#updateOperation" value="保存">
+                                           data-target="#updateOperationModal" value="保存">
                                 </div>
                             </div>
                         </div>
@@ -150,7 +150,7 @@
                 <h4 class="modal-title">新增文章类型</h4>
             </div>
             <div class="modal-body">
-                <form name="saveForm" class="form-horizontal">
+                <form name="saveForm" id="saveForm" class="form-horizontal">
                     <div class="form-group row">
                         <div class="col-xs-3 text-right">
                             <label class="control-label required">名称：</label>
@@ -218,7 +218,17 @@
     </div>
 </div>
 <%--新增文章，模态框结束--%>
+<jsp:include page="../common/common.jsp"></jsp:include>
 <%--新增文章--%>
+<script>
+    function removeType() {
+        var name = $("#typeName").val();
+        var id = $("#typeId").val();
+        removeObject(name,id);
+    }
+    ztreeName = "文章分类";
+    ossPathName = "article/";
+</script>
 <script type="text/javascript">
     var saveValidate = $saveForm.validate({
         errorClass: 'text-danger',
@@ -281,13 +291,6 @@
     }
 </script>
 <%--新增文章结束--%>
-<%--Url--%>
-<script>
-    ztreeUrl = "<%=request.getContextPath()%>/admin/article/type/combo/tree";
-    getUrl = "<%=request.getContextPath()%>/admin/article/type/get";
-</script>
-<%--Url--%>
-
 <%--编辑文章信息--%>
 <script>
     $updateForm.validate({
@@ -323,9 +326,6 @@
             });
         }
     });
-    function submitUpdate() {
-        $updateForm.submit();
-    }
 </script>
 <%--编辑文章信息结束--%>
 <%--编辑及删除图片结束--%>
